@@ -39,6 +39,12 @@ class BlackjackMDP(util.MDP):
     # All logic for dealing with end states should be placed into the succAndProbReward function below.
     def actions(self, state: Tuple) -> List[str]:
         return ['Take', 'Peek', 'Quit']
+    
+    def count_cards(self, deckCounts: Tuple) -> int:
+        count = 0
+        for counts in deckCounts:
+            count += counts
+        return count
 
     # Given a |state| and |action|, return a list of (newState, prob, reward) tuples
     # corresponding to the states reachable from |state| when taking |action|.
@@ -58,7 +64,14 @@ class BlackjackMDP(util.MDP):
 
         if state.deckCounts == None:
             return []
-
+        
+        cards_count = self.count_cards(state.deckCounts)
+        if cards_count == 0:
+            action = "Quit"
+            
+        if state == None:
+            return []
+        
         if action == 'Quit':
             newState = State(handTotal=state.handTotal,
                              nextCard=None,
@@ -67,7 +80,62 @@ class BlackjackMDP(util.MDP):
                                    probability=1,
                                    reward=state.handTotal)]
 
-        # END_YOUR_CODE
+        if action == 'Peek':
+            if state.nextCard != None:
+                return []
+            newState = State(handTotal=state.handTotal,nextCard=state.nextCard, deckCounts=state.deckCounts)
+            return [PossibleResult(successor=newState,
+                                   probability=1,
+                                   reward= -self.peekCost)]
+        elif action == 'Take':
+            
+            #terminal state deck running out of cards
+            if cards_count == 1:
+                #bust
+                index = None
+                newState = None
+                for i in range(len(state.deckCounts)):
+                    if state.deckCounts[i] != 0:
+                        index = i
+                        break
+                if state.handTotal + self.cardValues[index] > self.threshold: 
+                    newState = State(handTotal=0,
+                    nextCard=None,
+                    deckCounts=None)
+                else:
+                    newState = State(handTotal=state.handTotal+self.cardValues[index],
+                    nextCard=None,
+                    deckCounts=None)
+
+                return [PossibleResult(successor=newState,
+                    probability=1,
+                    reward=newState.handTotal)]
+            
+            possible_states = []
+            for i in range(len(state.deckCounts)):
+                current_card_count = state.deckCounts[i]
+                if current_card_count < 1:
+                    continue
+                current_card_value = self.cardValues[i]
+                new_deck = list(state.deckCounts)
+                new_deck[i] -= 1
+                new_deck = tuple(new_deck)
+                probability = current_card_count/cards_count  
+                newState = None
+                if state.handTotal + current_card_value > self.threshold:
+                    newState = State(handTotal=0,
+                        nextCard=None,
+                        deckCounts=None)
+                else:
+                    newState = State(handTotal=state.handTotal + current_card_value,
+                        nextCard=None,
+                        deckCounts=new_deck)
+                possible_states.append(PossibleResult(successor=newState,
+                    probability=probability,
+                    reward=newState.handTotal))
+            
+            return possible_states
+                    
 
     def discount(self):
         return 1
