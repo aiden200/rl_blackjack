@@ -74,10 +74,10 @@ class BlackjackMDP(util.MDP):
         if state == None:
             return []
         
-        if state.nextCard != None:
+        if state.nextCard != None and action == 'Take':
             newState = None
             if state.handTotal + self.cardValues[state.nextCard] > self.threshold:
-                newState = State(handTotal=state.handTotal,
+                newState = State(handTotal=0,
                              nextCard=None,
                              deckCounts=None)
             else:
