@@ -59,6 +59,8 @@ class BlackjackMDP(util.MDP):
     # tuples in the same order.
     def succAndProbReward(self, state: State, action: str) -> List[PossibleResult]:
         # BEGIN_YOUR_CODE HERE; I'VE ADDED SOME LIMITED STARTING CODE
+        # print(state, self.cardValues, self.threshold)
+
         if state.handTotal > self.threshold:
             return []
 
@@ -72,6 +74,25 @@ class BlackjackMDP(util.MDP):
         if state == None:
             return []
         
+        if state.nextCard != None:
+            newState = None
+            if state.handTotal + self.cardValues[state.nextCard] > self.threshold:
+                newState = State(handTotal=state.handTotal,
+                             nextCard=None,
+                             deckCounts=None)
+            else:
+                new_deck = list(state.deckCounts)
+                new_deck[state.nextCard] -= 1
+                new_deck = tuple(new_deck)
+                newState = State(handTotal=state.handTotal + self.cardValues[state.nextCard],
+                             nextCard=None,
+                             deckCounts=new_deck)
+            
+            return [PossibleResult(successor=newState,
+                                   probability=1,
+                                   reward=0)]
+
+        
         if action == 'Quit':
             newState = State(handTotal=state.handTotal,
                              nextCard=None,
@@ -81,9 +102,10 @@ class BlackjackMDP(util.MDP):
                                    reward=state.handTotal)]
 
         if action == 'Peek':
+            print(state.nextCard)
             if state.nextCard != None:
                 return []
-            newState = State(handTotal=state.handTotal,nextCard=state.nextCard, deckCounts=state.deckCounts)
+            newState = State(handTotal=state.handTotal,nextCard=self.computeStates, deckCounts=state.deckCounts)
             return [PossibleResult(successor=newState,
                                    probability=1,
                                    reward= -self.peekCost)]
@@ -132,7 +154,7 @@ class BlackjackMDP(util.MDP):
                         deckCounts=new_deck)
                 possible_states.append(PossibleResult(successor=newState,
                     probability=probability,
-                    reward=newState.handTotal))
+                    reward=0)) # is this correct
             
             return possible_states
                     

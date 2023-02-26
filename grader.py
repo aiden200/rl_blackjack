@@ -28,20 +28,31 @@ def test3a0():
                                    threshold=8, peekCost=1)
     mdp3_startState = mdp3.startState()
     mdp3_preBustState = State(6, None, (1, 1, 1))
+    mdp3_unevenState = State(1, None, (2, 3, 3))
 
     # Make sure the succAndProbReward function is implemented correctly.
     tests = [
-        ([(State(1, None, (1, 2)), 0.5, 0), (State(5, None, (2, 1)), 0.5, 0)], mdp1, startState, 'Take'),
-        ([(State(0, 0, (2, 2)), 0.5, -1), (State(0, 1, (2, 2)), 0.5, -1)], mdp1, startState, 'Peek'),
-        ([(State(0, None, None), 1, 0)], mdp1, startState, 'Quit'),
-        ([(State(7, None, (0, 1)), 0.5, 0), (State(11, None, None), 0.5, 0)], mdp1, preBustState, 'Take'),
+        ([PossibleResult(State(1, None, (1, 2)), 0.5, 0),
+          PossibleResult(State(5, None, (2, 1)), 0.5, 0)], mdp1, startState, 'Take'),
+        ([PossibleResult(State(0, 0, (2, 2)), 0.5, -1),
+          PossibleResult(State(0, 1, (2, 2)), 0.5, -1)], mdp1, startState, 'Peek'),
+        ([PossibleResult(State(0, None, None), 1, 0)], mdp1, startState, 'Quit'),
+        ([PossibleResult(State(7, None, (0, 1)), 0.5, 0),
+          PossibleResult(State(11, None, None), 0.5, 0)], mdp1, preBustState, 'Take'),
         ([], mdp1, postBustState, 'Take'),
         ([], mdp1, postBustState, 'Peek'),
         ([], mdp1, postBustState, 'Quit'),
-        ([(State(12, None, None), 1, 12)], mdp2, preEmptyState, 'Take'),
-        ([(State(1, None, (2, 3, 3)), 1/3, 0), (State(2, None, (3, 2, 3)), 1/3, 0), (State(3, None, (3, 3, 2)), 1/3, 0)], mdp3, mdp3_startState, 'Take'),
-        ([(State(7, None, (0, 1, 1)), 1/3, 0), (State(8, None, (1, 0, 1)), 1/3, 0), (State(9, None, None), 1/3, 0)], mdp3, mdp3_preBustState, 'Take'),
-        ([(State(6, None, None), 1, 6)], mdp3, mdp3_preBustState, 'Quit'),
+        ([PossibleResult(State(12, None, None), 1, 12)], mdp2, preEmptyState, 'Take'),
+        ([PossibleResult(State(1, None, (2, 3, 3)), 1/3, 0),
+          PossibleResult(State(2, None, (3, 2, 3)), 1/3, 0),
+          PossibleResult(State(3, None, (3, 3, 2)), 1/3, 0)], mdp3, mdp3_startState, 'Take'),
+        ([PossibleResult(State(7, None, (0, 1, 1)), 1/3, 0),
+          PossibleResult(State(8, None, (1, 0, 1)), 1/3, 0),
+          PossibleResult(State(9, None, None), 1/3, 0)], mdp3, mdp3_preBustState, 'Take'),
+        ([PossibleResult(State(2, None, (1, 3, 3)), 2/8, 0),
+          PossibleResult(State(3, None, (2, 2, 3)), 3/8, 0),
+          PossibleResult(State(4, None, (2, 3, 2)), 3/8, 0)], mdp3, mdp3_unevenState, 'Take'),
+        ([PossibleResult(State(6, None, None), 1, 6)], mdp3, mdp3_preBustState, 'Quit'),
         ([], mdp1, State(0, None, None), 'Take')
     ]
     for gold, mdp, state, action in tests:
