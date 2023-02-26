@@ -155,7 +155,7 @@ class BlackjackMDP(util.MDP):
                 probability = current_card_count/cards_count  
                 newState = None
                 if state.handTotal + current_card_value > self.threshold:
-                    newState = State(handTotal=state.handTotal,
+                    newState = State(handTotal=state.handTotal + current_card_value,
                         nextCard=None,
                         deckCounts=None)
                 else:
