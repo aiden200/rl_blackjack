@@ -102,13 +102,23 @@ class BlackjackMDP(util.MDP):
                                    reward=state.handTotal)]
 
         if action == 'Peek':
-            print(state.nextCard)
             if state.nextCard != None:
                 return []
-            newState = State(handTotal=state.handTotal,nextCard=self.computeStates, deckCounts=state.deckCounts)
-            return [PossibleResult(successor=newState,
-                                   probability=1,
-                                   reward= -self.peekCost)]
+            possible_states = []
+            for i in range(len(state.deckCounts)):
+                current_card_count = state.deckCounts[i]
+                if current_card_count < 1:
+                    continue
+                current_card_value = self.cardValues[i]
+                probability = current_card_count/cards_count  
+                newState = State(handTotal=state.handTotal,
+                    nextCard=i,
+                    deckCounts=state.deckCounts)
+                possible_states.append(PossibleResult(successor=newState,
+                    probability=probability,
+                    reward=-self.peekCost))     
+            return possible_states
+
         elif action == 'Take':
             
             #terminal state deck running out of cards
@@ -145,7 +155,7 @@ class BlackjackMDP(util.MDP):
                 probability = current_card_count/cards_count  
                 newState = None
                 if state.handTotal + current_card_value > self.threshold:
-                    newState = State(handTotal=0,
+                    newState = State(handTotal=state.handTotal,
                         nextCard=None,
                         deckCounts=None)
                 else:
