@@ -216,10 +216,14 @@ class QLearningAlgorithm(util.RLAlgorithm):
     def incorporateFeedback(self, state: State, action: Any, reward: int, newState: State) -> None:
         # BEGIN_YOUR_CODE; I'VE STARTED IT, BUT WITH NOT MUCH
 
+        if newState == None:
+            # s is terminal
+            return
+
         featureValues = self.featureExtractor(state, action)
+        difference = reward + self.discount*1 
         for featureKey, featureValue in featureValues:
             self.weights[featureKey] += 10
-
 
         # END_YOUR_CODE
 
