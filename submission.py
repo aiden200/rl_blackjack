@@ -218,12 +218,21 @@ class QLearningAlgorithm(util.RLAlgorithm):
 
         if newState == None:
             # s is terminal
+            
             return
 
         featureValues = self.featureExtractor(state, action)
-        difference = reward + self.discount*1 
-        for featureKey, featureValue in featureValues:
-            self.weights[featureKey] += 10
+        max_action_value = float('-inf')
+        for new_action in self.actions(newState):
+            temp_value = self.getQ(newState, new_action)
+            if temp_value > max_action_value:
+                max_action_value = temp_value
+
+        difference = reward + self.discount*max_action_value - self.getQ(state, action) # not sure if r(s') is correct
+
+        alpha = self.getStepSize()
+        for f, v in featureValues:
+            self.weights[f] += alpha*difference*v
 
         # END_YOUR_CODE
 
