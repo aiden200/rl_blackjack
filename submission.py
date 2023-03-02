@@ -218,7 +218,7 @@ class QLearningAlgorithm(util.RLAlgorithm):
 
         if newState == None:
             # s is terminal
-            
+
             return
 
         featureValues = self.featureExtractor(state, action)
@@ -328,8 +328,18 @@ def blackjackFeatureExtractor(state: State, action: str) -> List[Feature]:
 
     if state == None:
         return features
-
+    
     features.append(Feature(featureKey=('total', state.handTotal, action), featureValue=1))
+
+    if state.deckCounts != None:
+        bitCount = tuple([1 if x!=0 else 0 for x in state.deckCounts])
+        features.append(Feature(featureKey=('bitmask', bitCount, action), featureValue=1))
+
+        for i in range(len(state.deckCounts)):
+            features.append(Feature(featureKey=('indexCount', i, state.deckCounts[i], action), featureValue=1)) # double check this
+            
+
+
 
     return features
 
